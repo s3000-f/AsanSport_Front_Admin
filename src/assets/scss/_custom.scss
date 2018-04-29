@@ -1,1 +1,23 @@
 // Here you can add other styles
+@font-face {
+  font-family: "iransans";
+  font-weight: 200;
+  src: url("/static/fonts/iransans_ultralight.woff") format("woff");
+}
+@font-face {
+  font-family: "iransans";
+  font-weight: 500;
+  src: url("/static/fonts/iransans_medium.woff") format("woff");
+}
+@font-face {
+  font-family: "iransans";
+  font-weight: bold;
+  src: url("/static/fonts/iransans_bold.woff") format("woff");
+}
+
+body {
+  font-family: iransans;
+}
+h1, h2, h3, h4, h5, h6 {
+  font-family: iransans;
+}

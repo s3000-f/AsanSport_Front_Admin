@@ -22,7 +22,6 @@ export default {
   name: 'full',
   components: {
     AppHeader,
-    AppHeader,
     Sidebar,
     AppAside,
     AppFooter,

@@ -6,6 +6,7 @@ import Full from '@/containers/Full'
 
 // Views
 import Dashboard from '@/views/Dashboard'
+import Calendar from '@/views/Calendar'
 
 import Colors from '@/views/theme/Colors'
 import Typography from '@/views/theme/Typography'
@@ -48,9 +49,9 @@ import Modals from '@/views/notifications/Modals'
 
 // Views - Pages
 import Page404 from '@/views/pages/Page404'
-import Page500 from '@/views/pages/Page500'
+// import Page500 from '@/views/pages/Page500'
 import Login from '@/views/pages/Login'
-import Register from '@/views/pages/Register'
+// import Register from '@/views/pages/Register'
 
 Vue.use(Router)
 
@@ -74,6 +75,11 @@ export default new Router({
           path: 'dashboard',
           name: 'Dashboard',
           component: Dashboard
+        },
+        {
+          path: 'calendar',
+          name: 'Calendar',
+          component: Calendar
         },
         {
           path: 'theme',
@@ -272,6 +278,6 @@ export default new Router({
         }
       ]
     },
-    {path:'*', component: Page404}
+    {path: '*', component: Page404}
   ]
 })
