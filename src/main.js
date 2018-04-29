@@ -6,10 +6,14 @@ import App from './App'
 import router from './router'
 import {store} from './store/store'
 import Notifications from 'vue-notification'
+import FullCalendar from 'vue-full-calendar'
+
 
 
 Vue.use(BootstrapVue)
 Vue.use(Notifications)
+Vue.use(FullCalendar);
+
 Vue.mixin({
   methods: {
     toPersianNumber: (number) => {
