@@ -108,16 +108,25 @@
             </i>
             <i class="flag-icon flag-icon-pw h1" title="pw"></i>
             <div slot="reservation" slot-scope="item">
-              <span @click="alert('hello')"><strong>{{item.value}}</strong></span>
+              <span><strong>{{item.value}}</strong></span>
             </div>
           </b-table>
           <b-pagination size="md" :total-rows="table2Items.length" v-model="currentPage2" :per-page="5"></b-pagination>
         </b-card>
       </b-col>
     </b-row>
-    <b-modal ref="reserveModal">
-      hey there
-    </b-modal>
+    <sweet-modal ref="reserveModal">
+      <h3>ویرایش توضیحات</h3>
+      <div class="">
+      <div class="fancy-form">
+          <textarea v-model="notes" rows="5" class="form-control">{{selectedBooking.notes}}</textarea>
+        <div class="divider rounded-top"></div>
+        <button class="btn-success align-bottom">ثبت تغییرات</button>
+      </div>
+      </div>
+
+      <br/>
+    </sweet-modal>
     <b-modal ref="transactionModal">
       hello there
     </b-modal>
@@ -134,6 +143,7 @@
   import CalloutChartExample from './dashboard/CalloutChartExample'
   import {Callout} from '../components/'
   import axios from 'axios';
+  import {SweetModal, SweetModalTab} from 'sweet-modal-vue'
 
   export default {
     name: 'dashboard',
@@ -145,7 +155,9 @@
       CardBarChartExample,
       MainChartExample,
       SocialBoxChartExample,
-      CalloutChartExample
+      CalloutChartExample,
+      SweetModal,
+      SweetModalTab
     },
     data: function () {
       return {
@@ -177,8 +189,9 @@
             label: 'شرح'
           }
         },
-        table2Items: [
-        ],
+        table2Items: [],
+        selectedBooking:'',
+        notes:''
 
       }
     },
@@ -239,11 +252,32 @@
           console.log(e);
         });
       },
+      viewBooking(bookID){
+        const config = {
+          headers: {
+            Authorization: 'Bearer ' + this.$store.state.token,
+            'Content-Type': 'application/json',
+            'Accept': 'application/json'
+          }
+        };
+        axios.get('http://api.shahbandegan.ir/v1/bookings/'+bookID, config).then(resp => {
+          console.log(resp.data);
+          if (resp.status < 300) {
+            this.selectedBooking = resp.data.data;
+          }
+          else {
+            console.log(resp);
+          }
+        }).catch(e => {
+          console.log(e + "===============");
+        });
+      },
       reserveView(record, index) {
-        console.log('rec: ' + record);
+        console.log(record);
         console.log('ind: ' + index);
         this.index = index;
-        this.$refs.reserveModal.show();
+        this.viewBooking(record.id);
+        this.$refs.reserveModal.open();
 
 
       },
