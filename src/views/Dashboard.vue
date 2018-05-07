@@ -128,7 +128,7 @@
       <br/>
     </sweet-modal>
     <b-modal ref="transactionModal">
-      hello there
+salam
     </b-modal>
   </div>
 </template>
