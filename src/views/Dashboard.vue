@@ -121,7 +121,7 @@
       <div class="fancy-form">
           <textarea v-model="notes" rows="5" class="form-control">{{selectedBooking.notes}}</textarea>
         <div class="divider rounded-top"></div>
-        <button class="btn-success align-bottom">ثبت تغییرات</button>
+        <button class="btn-success align-bottom" v-on:click="updateNotes" style="margin-top: 10px">ثبت تغییرات</button>
       </div>
       </div>
 
@@ -161,6 +161,7 @@ salam
     },
     data: function () {
       return {
+        selectedID:'',
         selected: 'Month',
         index: 0,
         currentPage: 1,
@@ -252,6 +253,35 @@ salam
           console.log(e);
         });
       },
+      updateNotes(id) {
+        const config = {
+          headers: {
+            Authorization: 'Bearer ' + this.$store.state.token,
+            'Content-Type': 'application/json',
+            'Accept': 'application/json'
+          }
+        };
+        axios.put('http://api.shahbandegan.ir/v1/bookings/' + id + '/notes',{notes:this.notes} , config).then(resp => {
+          if (resp.status < 300) {
+            resp.data.data.forEach(dat => {
+              let d = {
+                date: this.toPersianNumber(dat.created_at),
+                amount: this.toPersianNumber(dat.amount),
+                reservation: dat.description,
+                id: dat.id
+              };
+              this.table2Items.push(d);
+            })
+
+          }
+          else {
+            console.log(resp);
+          }
+        }).catch(e => {
+          console.log(e);
+        });
+      },
+
       viewBooking(bookID){
         const config = {
           headers: {
@@ -277,6 +307,7 @@ salam
         console.log('ind: ' + index);
         this.index = index;
         this.viewBooking(record.id);
+        this.selectedID = record.id;
         this.$refs.reserveModal.open();
 
 

@@ -1,236 +1,359 @@
 <template>
-    <div class="animated fadeIn">
-        <b-row>
-            <b-col md="12">
-                <b-card header="تقویم من" class="text-right font-lg">
-                    <full-calendar ref="calendar" :event-sources="eventSources" @event-selected="eventSelected"
-                                   @event-created="eventCreated" :config="config"></full-calendar>
-                </b-card>
-            </b-col>
-        </b-row>
-    </div>
+  <div class="animated fadeIn">
+    <b-row>
+      <b-col md="12">
+        <b-card header="تقویم من" class="text-right font-lg">
+          <full-calendar ref="calendar" :event-sources="eventSources" @event-selected="eventSelected"
+                         @event-created="eventCreated" :config="config"></full-calendar>
+          <sweet-modal ref="book">
+            <h3>رزرو سالن</h3>
+            <div v-if="slotAvailable()">
+              <div class="row">
+                <div class="col-md-6 col-sm-6">
+                  <div class="row">
+                    <div class="col-md-12">
+                      <div class="fancy-form fancy-form-select">
+                        <select v-model="repeats" class="form-control">
+                          <option value="1">1 جلسه</option>
+                          <option value="4">4 جلسه</option>
+                          <option value="8">8 جلسه</option>
+                          <option value="12">12 جلسه</option>
+                          <option value="16">16 جلسه</option>
+                          <option value="20">20 جلسه</option>
+                          <option value="24">24 جلسه</option>
+                          <option value="28">28 جلسه</option>
+                          <option value="32">32 جلسه</option>
+                          <option value="36">36 جلسه</option>
+                          <option value="40">40 جلسه</option>
+                          <option value="44">44 جلسه</option>
+                          <option value="48">48 جلسه</option>
+                          <option value="52">52 جلسه</option>
+                        </select>
+                        <i class="fancy-arrow"></i>
+                      </div>
+                    </div>
+                  </div>
+                  <br>
+                  <div class="row">
+                    <div class="col-md-12">
+                      <div class="input-group">
+                        <input v-model="discount_code" type="text" id="discount_code" name="discount_code"
+                               class="form-control required" placeholder="کد تخفیف">
+                        <span class="input-group-btn">
+                    <button class="btn btn-info" type="submit" @click="discount">بررسی</button>
+                </span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div class="col-md-6 col-sm-6">
+                  <div class="fancy-form">
+                    <textarea v-model="notes" rows="5" class="form-control"
+                              placeholder="اگر پیشنهاد یا توضیحاتی دارید در اینجا بنویسید."></textarea>
+                    <i class="fa fa-sticky-note"></i>
+                  </div>
+                </div>
+              </div>
+              <div class="divider"></div>
+              <div class="row">
+                <div class="col-md-12 text-right">
+                  <span><strong>تاریخ: </strong></span><span>{{`${toPersianNumber(this.start.jYear())}/${toPersianNumber(this.start.jMonth()+1)}/${toPersianNumber(this.start.jDate())}`}}</span>
+                </div>
+                <div class="col-md-12 text-right">
+                  <span><strong>ساعت: </strong></span>
+                  <span>{{toPersianNumber(this.start.format('HH:mm'))}}</span> الی
+                  <!--<span>{{toPersianNumber(this.start.add(this.$parent.fieldData.duration, 'minutes').format('HH:mm'))}}</span>-->
+                </div>
+                <div class="col-md-12 text-right">
+                  <span><strong>قابل پرداخت: </strong></span><span>{{toPersianNumber(this.price)}}</span><span> تومان</span>
+                </div>
+              </div>
+              <div class="row">
+
+                <div v-if="$store.state.user.credit > this.price" class="alert alert-success">مبلغ از اعتبار شما کم می
+                  شود.
+                </div>
+                <div v-else class="alert alert-danger">اعتبار شما برای رزرو این سالن کافی نیست
+                  <a class="btn btn-info" :href="`http://api.shahbandegan.ir/profile/credit/add/`">افزایش اعتبار</a>
+                </div>
+
+                <div class="col-md-10 col-md-offset-1">
+                  <button class="btn btn-block btn-success margin-top-20" @click="book">ثبت سفارش</button>
+                </div>
+              </div>
+            </div>
+            <div v-else>
+
+            </div>
+          </sweet-modal>
+
+        </b-card>
+      </b-col>
+    </b-row>
+  </div>
 
 </template>
 
 
 <script>
-/* eslint-disable indent */
+  /* eslint-disable indent */
 
-    //   export default {
-//     mounted() {
-//       var calendar = $('#calendar').fullCalendar({
-//         header: {
-//           left: 'next,prev today',
-//           right: 'title'
-//         },
-//         buttonIcons: {
-//           prev: 'right-single-arrow',
-//           next: 'left-single-arrow',
-//           prevYear: 'left-double-arrow',
-//           nextYear: 'right-double-arrow'
-//         },
-//         isJalaali: true,
-//         isRTL: true,
-//         navlinks: false,
-//         lang: 'fa',
-//         eventLimit: false, // allow "more" link when too many events
-//         defaultView: 'agendaWeek',
-//         height: 550,
-//         allDaySlot: false,
-//         eventDurationEditable: false,
-//         eventOverlap: false,
-//         slotDuration: '00:30:00',
-//         slotLabelFormat: 'hh:mm',
-//         loading: function (bool) {
-//           $('#loading').toggle(bool);
-//         },
-//         editable: false,
-// //            eventDrop: eventMoved,
-//         events: {
-//           url: `http://api.shahbandegan.ir/v1/fields/y6NZ6Q/schedule`,
-//           method: "post",
-//           error: function () {
-//             $('#loadingError').show();
-//           }
-//         }
-//       });
-//     }
-//   }
+  //   export default {
+  //     mounted() {
+  //       var calendar = $('#calendar').fullCalendar({
+  //         header: {
+  //           left: 'next,prev today',
+  //           right: 'title'
+  //         },
+  //         buttonIcons: {
+  //           prev: 'right-single-arrow',
+  //           next: 'left-single-arrow',
+  //           prevYear: 'left-double-arrow',
+  //           nextYear: 'right-double-arrow'
+  //         },
+  //         isJalaali: true,
+  //         isRTL: true,
+  //         navlinks: false,
+  //         lang: 'fa',
+  //         eventLimit: false, // allow "more" link when too many events
+  //         defaultView: 'agendaWeek',
+  //         height: 550,
+  //         allDaySlot: false,
+  //         eventDurationEditable: false,
+  //         eventOverlap: false,
+  //         slotDuration: '00:30:00',
+  //         slotLabelFormat: 'hh:mm',
+  //         loading: function (bool) {
+  //           $('#loading').toggle(bool);
+  //         },
+  //         editable: false,
+  // //            eventDrop: eventMoved,
+  //         events: {
+  //           url: `http://api.shahbandegan.ir/v1/fields/y6NZ6Q/schedule`,
+  //           method: "post",
+  //           error: function () {
+  //             $('#loadingError').show();
+  //           }
+  //         }
+  //       });
+  //     }
+  //   }
 
-import moment from 'moment';
-// import {SweetModal, SweetModalTab} from 'sweet-modal-vue'
-import axios from 'axios'
+  import moment from 'moment';
+  import {SweetModal, SweetModalTab} from 'sweet-modal-vue'
+  import axios from 'axios'
+  import jMoment from 'moment-jalaali'
 
-export default {
+  export default {
     name: 'FieldCalendar',
     data() {
-        return {
-            repeats: 1,
-            discount_code: null,
-            notes: null,
-            start: null,
+      return {
+        repeats: 1,
+        discount_code: null,
+        notes: null,
+        start: jMoment(),
 
-            events: [
-                {
-                    id: 1,
-                    title: 'event1',
-                    start: moment().hours(12).minutes(0),
-                },
-                {
-                    id: 2,
-                    title: 'event2',
-                    start: moment().add(-1, 'days'),
-                    end: moment().add(1, 'days'),
-                    allDay: true,
-                },
-                {
-                    id: 3,
-                    title: 'event3',
-                    start: moment().add(2, 'days'),
-                    end: moment().add(2, 'days').add(6, 'hours'),
-                    allDay: false,
-                },
-            ],
+        events: [
+          {
+            id: 1,
+            title: 'event1',
+            start: moment().hours(12).minutes(0),
+          },
+          {
+            id: 2,
+            title: 'event2',
+            start: moment().add(-1, 'days'),
+            end: moment().add(1, 'days'),
+            allDay: true,
+          },
+          {
+            id: 3,
+            title: 'event3',
+            start: moment().add(2, 'days'),
+            end: moment().add(2, 'days').add(6, 'hours'),
+            allDay: false,
+          },
+        ],
 
-            config: {
-                eventClick: (event) => {
-                    this.selected = event;
-                },
-                dayClick: (event) => {
-                    console.log(event.utc().format('D-M-Y H:mm'));
-                    this.start = (event.utc().format('D-M-Y H:mm'));
-                },
-                // windowResize: function(view) {
-                //     if (window.width < 514) {
-                //         this.$refs.calendar.fireMethod('changeView', 'basicDay')
-                //     } else {
-                //         this.$refs.calendar.fireMethod('changeView', 'basicWeek')
-                //     }
-                // },
-                header: {
-                    left: '',//'next,prev today',
-                    right: 'title',
-                    center: ''
+        config: {
+          eventClick: (event) => {
+            this.selected = event;
+          },
+          dayClick: (event) => {
+            console.log(event.utc().format('D-M-Y H:mm'));
+            this.start = (event.utc().format('D-M-Y H:mm'));
+          },
+          // windowResize: function(view) {
+          //     if (window.width < 514) {
+          //         this.$refs.calendar.fireMethod('changeView', 'basicDay')
+          //     } else {
+          //         this.$refs.calendar.fireMethod('changeView', 'basicWeek')
+          //     }
+          // },
+          header: {
+            left: '',//'next,prev today',
+            right: 'title',
+            center: ''
 //                    right: 'month,agendaWeek,agendaDay'
-                },
-                buttonIcons: {
-                    prev: 'right-single-arrow',
-                    next: 'left-single-arrow',
-                    prevYear: 'left-double-arrow',
-                    nextYear: 'right-double-arrow'
-                },
-                locale: 'fa',
-                isJalaali: true,
-                isRTL: true,
-                lang: 'fa',
-                eventLimit: false, // allow "more" link when too many events
-                defaultView: 'agendaWeek',
-                height: 500,
-                allDaySlot: false,
-                eventDurationEditable: false,
-                eventOverlap: false,
-                slotDuration: '01:00:00',
-                slotLabelFormat: 'HH:mm',
-                editable: false,
-                overlap: false
+          },
+          buttonIcons: {
+            prev: 'right-single-arrow',
+            next: 'left-single-arrow',
+            prevYear: 'left-double-arrow',
+            nextYear: 'right-double-arrow'
+          },
+          locale: 'fa',
+          isJalaali: true,
+          isRTL: true,
+          lang: 'fa',
+          eventLimit: false, // allow "more" link when too many events
+          defaultView: 'agendaWeek',
+          height: 500,
+          allDaySlot: false,
+          eventDurationEditable: false,
+          eventOverlap: false,
+          slotDuration: '01:00:00',
+          slotLabelFormat: 'HH:mm',
+          editable: false,
+          overlap: false
 
-            },
+        },
 
-            selected: {},
-        };
+        selected: {},
+      };
     },
 
     methods: {
-        refreshEvents() {
-            this.$refs.calendar.$emit('refetch-events');
-        },
+      refreshEvents() {
+        this.$refs.calendar.$emit('refetch-events');
+      },
 
-        removeEvent() {
-            this.$refs.calendar.$emit('remove-event', this.selected);
-            this.selected = {};
-        },
+      removeEvent() {
+        this.$refs.calendar.$emit('remove-event', this.selected);
+        this.selected = {};
+      },
 
-        eventSelected(event) {
-            this.selected = event;
-        },
+      eventSelected(event) {
+        this.selected = event;
+      },
 
-        eventCreated(...test) {
-            console.log(test);
-        },
-        book() {
+      eventCreated(...test) {
+        console.log(test);
+      },
+      book() {
 
-            console.log(this.repeats);
-            console.log(this.notes);
-            console.log(this.discount_code);
-            console.log(this.start);
+        console.log(this.repeats);
+        console.log(this.notes);
+        console.log(this.discount_code);
+        console.log(this.start);
 
-            let dat = {
-                start: this.start,
-                repeats: this.repeats,
-                notes: (this.notes == null) ? this.notes : '',
-                discount_code: (this.discount_code == null) ? this.discount_code : ''
-            };
-            let config = {
-                headers: {
-                    Authorization: 'Bearer ' + this.$store.state.token,
-                    'Content-Type': 'application/json',
-                    'Accept': 'application/json'
-                }
-            };
-            axios.post('http://api.shahbandegan.ir/v1/fields/' + this.$route.params.id + '/book', dat, config)
-                .then(response => {
-                    if (response.status < 300) {
-                        this.notif('توجه', 'رزرو سالن شما با موفقیت ثبت شد', 'success')
-                    } else {
-                        this.notif('خطا', 'خطای داخلی، لطفا بعدا تلاش کنید', 'error');
-                    }
-                })
-                .catch(e => {
-                    console.log(e);
-                    this.notif('خطا', 'خطا در برقراری ارتباط', 'error');
-                });
-            this.repeats = 1;
-            this.notes = null;
-            this.discount_code = null;
-        },
+        let dat = {
+          start: this.start,
+          repeats: this.repeats,
+          notes: (this.notes == null) ? this.notes : '',
+          discount_code: (this.discount_code == null) ? this.discount_code : ''
+        };
+        let config = {
+          headers: {
+            Authorization: 'Bearer ' + this.$store.state.token,
+            'Content-Type': 'application/json',
+            'Accept': 'application/json'
+          }
+        };
+        axios.post('http://api.shahbandegan.ir/v1/fields/' + this.$route.params.id + '/book', dat, config)
+          .then(response => {
+            if (response.status < 300) {
+              this.notif('توجه', 'رزرو سالن شما با موفقیت ثبت شد', 'success')
+            } else {
+              this.notif('خطا', 'خطای داخلی، لطفا بعدا تلاش کنید', 'error');
+            }
+          })
+          .catch(e => {
+            console.log(e);
+            this.notif('خطا', 'خطا در برقراری ارتباط', 'error');
+          });
+        this.repeats = 1;
+        this.notes = null;
+        this.discount_code = null;
+      },
+
+
+      discount() {
+        let config = {
+          headers: {
+            Authorization: 'Bearer ' + this.$store.state.token,
+            'Content-Type': 'application/json',
+            'Accept': 'application/json'
+          }
+        };
+        axios.get('http://api.shahbandegan.ir/v1/discounts/' + this.discount_code, config)
+          .then(response => {
+            if (response.status === 200) {
+              if (response.data.available) {
+                this.notif('توجه', response.data.percent * 100 + ' درصد از فاکتور شما کم شد.', 'success')
+                this.price -= response.data.percent * this.price;
+              }
+              else
+                this.notif('توجه', response.data.message, 'error')
+            } else {
+              this.notif('خطا', 'خطای داخلی، لطفا بعدا تلاش کنید', 'error');
+            }
+          })
+          .catch(e => {
+            console.log(e);
+            this.notif('خطا', 'خطا در برقراری ارتباط', 'error');
+          });
+      },
+
+      slotAvailable() {
+        return true;
+      },
+
+      notif(title, text, type) {
+        this.$notify({
+          text: text,
+          type: type,
+          title: title
+        })
+      }
     },
 
     computed: {
-        eventSources() {
-            const self = this;
-            return [
-                {
-                    events(start, end, timezone, callback) {
-                        setTimeout(() => {
-                            console.log("================")
-                            axios.get('http://api.shahbandegan.ir/v1/fields/' + self.$route.params.id + '/schedule')
-                                .then(response => {
-                                    console.log("================XXXXX=================")
-                                    if (response.status < 300) {
-                                        console.log(response.data)
-                                        callback(response.data)
-                                    } else {
-                                        this.notif('خطا', 'خطای داخلی، لطفا بعدا تلاش کنید', 'error');
-                                    }
-                                })
-                                .catch(e => {
-                                    console.log(e);
-                                    this.notif('خطا', 'خطا در برقراری ارتباط', 'error');
-                                });
-                        }, 1000);
-                    },
-                    overlap: "false",
-                    rendering: "background",
-                    color: "#ff9f89"
-                },
-            ];
-        },
+      eventSources() {
+        const self = this;
+        return [
+          {
+            events(start, end, timezone, callback) {
+              setTimeout(() => {
+                console.log("================")
+                axios.get('http://api.shahbandegan.ir/v1/fields/' + self.$route.params.id + '/schedule')
+                  .then(response => {
+                    console.log("================XXXXX=================")
+                    if (response.status < 300) {
+                      console.log(response.data)
+                      callback(response.data)
+                    } else {
+                      this.notif('خطا', 'خطای داخلی، لطفا بعدا تلاش کنید', 'error');
+                    }
+                  })
+                  .catch(e => {
+                    console.log(e);
+                    this.notif('خطا', 'خطا در برقراری ارتباط', 'error');
+                  });
+              }, 1000);
+            },
+            overlap: "false",
+            rendering: "background",
+            color: "#ff9f89"
+          },
+        ];
+      },
     },
     components: {
-        // SweetModal,
-        // SweetModalTab
+      SweetModal,
+      SweetModalTab
     }
-};
+  };
 </script>
 
 <style src="../assets/css/fullcalendar.min.css"></style>
