@@ -43,42 +43,72 @@
   //
   // Sidebar
   //
+
+  @include media-breakpoint-down(md) {
+    .sidebar {
+      margin-left: auto;
+      margin-right: - $mobile-sidebar-width;
+    }
+    .aside-menu {
+      margin-right: auto;
+      margin-left: - $aside-menu-width;
+    }
+  }
   .sidebar-hidden {
     .sidebar {
       margin-right: - $sidebar-width;
+      margin-left: auto;
+    }
+  }
+
+  .sidebar-mobile-show {
+    .sidebar {
+      margin-right: 0;
+    }
+    .main {
+      margin-left: - $mobile-sidebar-width !important;
+      margin-right: $mobile-sidebar-width !important;
     }
   }
 
   .sidebar-fixed {
+
     .main, .app-footer {
       margin-right: $sidebar-width;
+      @include media-breakpoint-down(md) {
+        margin-right: 0;
+      }
     }
 
     &.sidebar-hidden {
+
       .main, .app-footer {
         margin-right: 0;
       }
     }
   }
 
-  .sidebar-minimized {
+  .sidebar-compact {
     .sidebar {
-      flex: 0 0 $sidebar-minimized-width;
+      flex: 0 0 $sidebar-compact-width;
     }
 
     &.sidebar-hidden {
+
       .sidebar {
-        margin-right: - $sidebar-minimized-width;
-        margin-left: 0;
+        margin-left: - $sidebar-compact-width;
+        margin-right: auto;
       }
     }
 
     &.sidebar-fixed {
+
       .main, .app-footer {
-        margin-right: $sidebar-minimized-width;
+        margin-left: $sidebar-compact-width;
       }
 
       &.sidebar-hidden {
+
         .main, .app-footer {
           margin-left: 0;
         }
