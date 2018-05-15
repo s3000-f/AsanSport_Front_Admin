@@ -191,14 +191,14 @@
           //     }
           // },
           header: {
-            left: '',//'next,prev today',
-            right: 'title',
-            center: ''
+            left: 'next,prev today',
+            center: 'title',
+            right: 'month,agendaWeek,agendaDay'
 //                    right: 'month,agendaWeek,agendaDay'
           },
           buttonIcons: {
-            prev: 'right-single-arrow',
-            next: 'left-single-arrow',
+            prev: 'left-single-arrow',
+            next: 'right-single-arrow',
             prevYear: 'left-double-arrow',
             nextYear: 'right-double-arrow'
           },
@@ -208,14 +208,16 @@
           lang: 'fa',
           eventLimit: false, // allow "more" link when too many events
           defaultView: 'agendaWeek',
-          height: 500,
+          height: 'auto',
           allDaySlot: false,
           eventDurationEditable: false,
           eventOverlap: false,
           slotDuration: '01:00:00',
           slotLabelFormat: 'HH:mm',
           editable: false,
-          overlap: false
+          overlap: false,
+          minTime: '06:00'
+            // maxTime: '23:59'
 
         },
 
