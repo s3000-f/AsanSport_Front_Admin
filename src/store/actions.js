@@ -64,6 +64,16 @@ export default {
     context.commit('verifyUser');
   },
   setCurrentField: (context, id) => {
-    context.commit('setCurrentField', id);
+    let field = [];
+    axios.get('http://api.shahbandegan.ir/v1/fields/' + id).then(resp => {
+      if (resp.status < 300) {
+        field = resp.data['data'];
+      } else {
+        console.log(resp);
+      }
+    }).catch(e => {
+      console.log(e);
+    });
+    context.commit('setCurrentField', field);
   }
 }
