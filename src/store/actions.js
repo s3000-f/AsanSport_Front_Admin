@@ -19,7 +19,7 @@ export default {
       }
     };
     let fields = [];
-    axios.get('http://api.shahbandegan.ir/v1/profile/fields', config).then(resp => {
+    axios.get('https://api.asansport.com/v1/profile/fields', config).then(resp => {
       if (resp.status < 300) {
         fields = resp.data['data'];
       }
@@ -29,7 +29,7 @@ export default {
     }).catch(e => {
       console.log(e);
     });
-    axios.get('http://api.shahbandegan.ir/v1/profile', config).then(response => {
+    axios.get('https://api.asansport.com/v1/profile', config).then(response => {
       if (response.status < 300) {
         commit('resetError');
         let dats = response.data['data'];
@@ -51,7 +51,7 @@ export default {
         'Accept': 'application/json'
       }
     };
-    axios.post('http://api.shahbandegan.ir/v1/logout', {}, config).then(response => {
+    axios.post('https://api.asansport.com/v1/logout', {}, config).then(response => {
       console.log(response)
     }).catch(e => {
       console.log(e)
@@ -65,7 +65,7 @@ export default {
   },
   setCurrentField: (context, id) => {
     let field = [];
-    axios.get('http://api.shahbandegan.ir/v1/fields/' + id).then(resp => {
+    axios.get('https://api.asansport.com/v1/fields/' + id).then(resp => {
       if (resp.status < 300) {
         field = resp.data['data'];
       } else {

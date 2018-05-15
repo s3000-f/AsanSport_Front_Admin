@@ -205,7 +205,7 @@ salam
             'Accept': 'application/json'
           }
         };
-        axios.get('http://api.shahbandegan.ir/v1/fields/' + this.$store.state.current_field + '/admin/bookings', config).then(resp => {
+        axios.get('https://api.asansport.com/v1/fields/' + this.$store.state.current_field + '/admin/bookings', config).then(resp => {
           if (resp.status < 300) {
             resp.data.data.forEach(dat => {
               let d = {
@@ -233,7 +233,7 @@ salam
             'Accept': 'application/json'
           }
         };
-        axios.get('http://api.shahbandegan.ir/v1/fields/' + this.$store.state.current_field + '/admin/transactions', config).then(resp => {
+        axios.get('https://api.asansport.com/v1/fields/' + this.$store.state.current_field + '/admin/transactions', config).then(resp => {
           if (resp.status < 300) {
             resp.data.data.forEach(dat => {
               let d = {
@@ -261,7 +261,7 @@ salam
             'Accept': 'application/json'
           }
         };
-        axios.put('http://api.shahbandegan.ir/v1/bookings/' + id + '/notes',{notes:this.notes} , config).then(resp => {
+        axios.put('https://api.asansport.com/v1/bookings/' + id + '/notes',{notes:this.notes} , config).then(resp => {
           if (resp.status < 300) {
             resp.data.data.forEach(dat => {
               let d = {
@@ -290,7 +290,7 @@ salam
             'Accept': 'application/json'
           }
         };
-        axios.get('http://api.shahbandegan.ir/v1/bookings/'+bookID, config).then(resp => {
+        axios.get('https://api.asansport.com/v1/bookings/'+bookID, config).then(resp => {
           console.log(resp.data);
           if (resp.status < 300) {
             this.selectedBooking = resp.data.data;

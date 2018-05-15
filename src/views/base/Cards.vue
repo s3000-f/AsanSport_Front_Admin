@@ -66,7 +66,7 @@
             'Accept': 'application/json'
           }
         };
-        axios.get('http://api.shahbandegan.ir/v1/fields/' + this.$store.state.current_field + '/images', config).then(response => {
+        axios.get('https://api.asansport.com/v1/fields/' + this.$store.state.current_field + '/images', config).then(response => {
           if (response.status < 300) {
             this.images = response.data.data;
           } else {
@@ -104,7 +104,7 @@
             'Accept': 'application/json'
           }
         };
-        axios.post('http://api.shahbandegan.ir/v1/fields/' + this.$store.state.current_field + '/images', fd, config)
+        axios.post('https://api.asansport.com/v1/fields/' + this.$store.state.current_field + '/images', fd, config)
           .then(response => {
             if (response.status < 300) {
               this.$notify({
@@ -132,7 +132,7 @@
             'Accept': 'application/json'
           }
         };
-        axios.delete('http://api.shahbandegan.ir/v1/fields/' + this.$store.state.current_field + '/images/' + id, config).then(response => {
+        axios.delete('https://api.asansport.com/v1/fields/' + this.$store.state.current_field + '/images/' + id, config).then(response => {
           if (response.status < 300) {
             let img = []
             this.images.forEach(i => {

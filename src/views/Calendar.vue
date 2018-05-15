@@ -74,7 +74,7 @@
                   شود.
                 </div>
                 <div v-else class="alert alert-danger">اعتبار شما برای رزرو این سالن کافی نیست
-                  <a class="btn btn-info" :href="`http://api.shahbandegan.ir/profile/credit/add/`">افزایش اعتبار</a>
+                  <a class="btn btn-info" :href="`https://api.asansport.com/profile/credit/add/`">افزایش اعتبار</a>
                 </div>
 
                 <div class="col-md-10 col-md-offset-1">
@@ -129,7 +129,7 @@
   //         editable: false,
   // //            eventDrop: eventMoved,
   //         events: {
-  //           url: `http://api.shahbandegan.ir/v1/fields/y6NZ6Q/schedule`,
+  //           url: `https://api.asansport.com/v1/fields/y6NZ6Q/schedule`,
   //           method: "post",
   //           error: function () {
   //             $('#loadingError').show();
@@ -262,7 +262,7 @@
             'Accept': 'application/json'
           }
         };
-        axios.post('http://api.shahbandegan.ir/v1/fields/' + this.$route.params.id + '/book', dat, config)
+        axios.post('https://api.asansport.com/v1/fields/' + this.$route.params.id + '/book', dat, config)
           .then(response => {
             if (response.status < 300) {
               this.notif('توجه', 'رزرو سالن شما با موفقیت ثبت شد', 'success')
@@ -288,7 +288,7 @@
             'Accept': 'application/json'
           }
         };
-        axios.get('http://api.shahbandegan.ir/v1/discounts/' + this.discount_code, config)
+        axios.get('https://api.asansport.com/v1/discounts/' + this.discount_code, config)
           .then(response => {
             if (response.status === 200) {
               if (response.data.available) {
@@ -328,7 +328,7 @@
             events(start, end, timezone, callback) {
               setTimeout(() => {
                 console.log("================")
-                axios.get('http://api.shahbandegan.ir/v1/fields/' + self.$route.params.id + '/schedule')
+                axios.get('https://api.asansport.com/v1/fields/' + self.$route.params.id + '/schedule')
                   .then(response => {
                     console.log("================XXXXX=================")
                     if (response.status < 300) {
