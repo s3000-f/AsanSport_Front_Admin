@@ -1,5 +1,12 @@
 <template>
-  <div class="animated fadeIn">
+  <div>
+    <sweet-modal ref="calendarModal">
+      <sweet-modal-tab ref="createBusyTime" title="رزرو وقت" id="tab1">Contents of Tab 1</sweet-modal-tab>
+      <sweet-modal-tab ref="createBooking" title="ایجاد ساعت پر" id="tab2">Contents of Tab 2</sweet-modal-tab>
+    </sweet-modal>
+
+
+    <div class="animated fadeIn">
     <b-row>
       <b-col md="12">
         <b-card header="تقویم من" class="text-right font-lg">
@@ -91,7 +98,7 @@
       </b-col>
     </b-row>
   </div>
-
+  </div>
 </template>
 
 
@@ -151,37 +158,27 @@
         repeats: 1,
         discount_code: null,
         notes: null,
-        start: jMoment(),
-
-        events: [
-          {
-            id: 1,
-            title: 'event1',
-            start: moment().hours(12).minutes(0),
-          },
-          {
-            id: 2,
-            title: 'event2',
-            start: moment().add(-1, 'days'),
-            end: moment().add(1, 'days'),
-            allDay: true,
-          },
-          {
-            id: 3,
-            title: 'event3',
-            start: moment().add(2, 'days'),
-            end: moment().add(2, 'days').add(6, 'hours'),
-            allDay: false,
-          },
-        ],
+          start: jMoment(),
+        selection: {
+          start: jMoment(),
+          end: jMoment(),
+          bookable: false
+        },
 
         config: {
           eventClick: (event) => {
             this.selected = event;
+            alert(event.id)
           },
           dayClick: (event) => {
             console.log(event.utc().format('D-M-Y H:mm'));
             this.start = (event.utc().format('D-M-Y H:mm'));
+          },
+          select: (start, end) => {
+              this.selection.start = start
+              this.selection.end = end
+              this.$refs.createBooking.disabled = moment.duration(end.diff(start)).asMinutes() !== 60
+              this.$refs.calendarModal.open();
           },
           // windowResize: function(view) {
           //     if (window.width < 514) {
@@ -216,7 +213,8 @@
           slotLabelFormat: 'HH:mm',
           editable: false,
           overlap: false,
-          minTime: '06:00'
+          minTime: '06:00',
+          displayEventTime: false
             // maxTime: '23:59'
 
         },
@@ -279,44 +277,31 @@
         this.discount_code = null;
       },
 
-
-      discount() {
-        let config = {
-          headers: {
-            Authorization: 'Bearer ' + this.$store.state.token,
-            'Content-Type': 'application/json',
-            'Accept': 'application/json'
-          }
-        };
-        axios.get('https://api.asansport.com/v1/discounts/' + this.discount_code, config)
-          .then(response => {
-            if (response.status === 200) {
-              if (response.data.available) {
-                this.notif('توجه', response.data.percent * 100 + ' درصد از فاکتور شما کم شد.', 'success')
-                this.price -= response.data.percent * this.price;
+      createBusyTime() {
+          let config = {
+              headers: {
+                  Authorization: 'Bearer ' + self.$store.state.token,
+                  'Content-Type': 'application/json',
+                  'Accept': 'application/json'
               }
-              else
-                this.notif('توجه', response.data.message, 'error')
-            } else {
-              this.notif('خطا', 'خطای داخلی، لطفا بعدا تلاش کنید', 'error');
-            }
-          })
-          .catch(e => {
-            console.log(e);
-            this.notif('خطا', 'خطا در برقراری ارتباط', 'error');
-          });
-      },
-
-      slotAvailable() {
-        return true;
-      },
-
-      notif(title, text, type) {
-        this.$notify({
-          text: text,
-          type: type,
-          title: title
-        })
+          };
+          let data = {
+              start: this.selection.start,
+              end: this.selection.end,
+              repeats: this.repeats,
+          }
+          axios.post('https://api.asansport.com/v1/fields/' + self.$store.state.current_field + '/admin/schedule', data,config)
+              .then(response => {
+                  if (response.status === 201) {
+                      this.refreshEvents()
+                  } else {
+                      this.notif('خطا', 'خطای داخلی، لطفا بعدا تلاش کنید', 'error');
+                  }
+              })
+              .catch(e => {
+                  console.log(e);
+                  this.notif('خطا', 'خطا در برقراری ارتباط', 'error');
+              });
       }
     },
 
@@ -326,27 +311,55 @@
         return [
           {
             events(start, end, timezone, callback) {
-              setTimeout(() => {
-                console.log("================")
-                axios.get('https://api.asansport.com/v1/fields/' + self.$route.params.id + '/schedule')
-                  .then(response => {
-                    console.log("================XXXXX=================")
-                    if (response.status < 300) {
-                      console.log(response.data)
-                      callback(response.data)
-                    } else {
-                      this.notif('خطا', 'خطای داخلی، لطفا بعدا تلاش کنید', 'error');
+                let config = {
+                    headers: {
+                        Authorization: 'Bearer ' + self.$store.state.token,
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json'
                     }
-                  })
-                  .catch(e => {
-                    console.log(e);
-                    this.notif('خطا', 'خطا در برقراری ارتباط', 'error');
-                  });
-              }, 1000);
+                };
+              axios.get('https://api.asansport.com/v1/fields/' + self.$store.state.current_field + '/admin/bookings'
+                  + `?start=${start}&end=${end}`, config)
+                .then(response => {
+                  if (response.status < 300) {
+                    console.log(response.data)
+                    callback(response.data.data)
+                  } else {
+                    this.notif('خطا', 'خطای داخلی، لطفا بعدا تلاش کنید', 'error');
+                  }
+                })
+                .catch(e => {
+                  console.log(e);
+                  this.notif('خطا', 'خطا در برقراری ارتباط', 'error');
+                });
+            }
+          },
+          {
+            events(start, end, timezone, callback) {
+                let config = {
+                    headers: {
+                        Authorization: 'Bearer ' + self.$store.state.token,
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json'
+                    }
+                };
+              axios.get('https://api.asansport.com/v1/fields/' + self.$store.state.current_field + '/admin/schedule'
+                  + `?start=${start}&end=${end}`, config)
+                .then(response => {
+                  if (response.status < 300) {
+                    console.log(response.data)
+                    callback(response.data)
+                  } else {
+                    this.notif('خطا', 'خطای داخلی، لطفا بعدا تلاش کنید', 'error');
+                  }
+                })
+                .catch(e => {
+                  console.log(e);
+                  this.notif('خطا', 'خطا در برقراری ارتباط', 'error');
+                });
             },
-            overlap: "false",
-            rendering: "background",
-            color: "#ff9f89"
+              color: 'red',
+              overlap: false
           },
         ];
       },
