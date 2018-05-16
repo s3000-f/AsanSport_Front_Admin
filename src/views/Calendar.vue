@@ -35,51 +35,34 @@
         <b-card header="تقویم من" class="text-right font-lg">
           <full-calendar ref="calendar" :event-sources="eventSources" @event-selected="eventSelected"
                          @event-created="eventCreated" :config="config"></full-calendar>
-          <sweet-modal ref="book">
+          <sweet-modal v-if="loaded" ref="book">
             <h3>رزرو سالن</h3>
             <div v-if="true">
               <div class="row">
                 <div class="col-md-6 col-sm-6">
                   <div class="row">
                     <div class="col-md-12">
-                      <div class="fancy-form fancy-form-select">
-                        <select v-model="repeats" class="form-control">
-                          <option value="1">1 جلسه</option>
-                          <option value="4">4 جلسه</option>
-                          <option value="8">8 جلسه</option>
-                          <option value="12">12 جلسه</option>
-                          <option value="16">16 جلسه</option>
-                          <option value="20">20 جلسه</option>
-                          <option value="24">24 جلسه</option>
-                          <option value="28">28 جلسه</option>
-                          <option value="32">32 جلسه</option>
-                          <option value="36">36 جلسه</option>
-                          <option value="40">40 جلسه</option>
-                          <option value="44">44 جلسه</option>
-                          <option value="48">48 جلسه</option>
-                          <option value="52">52 جلسه</option>
-                        </select>
-                        <i class="fancy-arrow"></i>
-                      </div>
+                      <strong >رزرو شده توسط:</strong> {{selectedBooking.user.name}}
                     </div>
                   </div>
                   <br>
                   <div class="row">
                     <div class="col-md-12">
-                      <div class="input-group">
-                        <input v-model="discount_code" type="text" id="discount_code" name="discount_code"
-                               class="form-control required" placeholder="کد تخفیف">
-                        <span class="input-group-btn">
+                        <strong v-if="loaded && selectedBooking.transaction.status === 1 ">وضعیت پرداخت: پرداخت شده</strong>
+                        <strong v-else="selectedBooking.transaction.status === 0 ">وضعیت پرداخت: پرداخت نشده</strong>
+                      <br/>
+                      <strong >هزینه:</strong> {{toPersianNumber(selectedBooking.transaction.amount)}} تومان
+
+                      <span class="input-group-btn">
                 </span>
-                      </div>
+
                     </div>
                   </div>
                 </div>
                 <div class="col-md-6 col-sm-6">
                   <div class="fancy-form">
                     <textarea v-model="notes" rows="5" class="form-control"
-                              placeholder="اگر پیشنهاد یا توضیحاتی دارید در اینجا بنویسید."></textarea>
-                    <i class="fa fa-sticky-note"></i>
+                              placeholder="یادداشت های خود را در اینجا بنویسید."></textarea>
                   </div>
                 </div>
               </div>
@@ -88,26 +71,14 @@
                 <div class="col-md-12 text-right">
                 </div>
                 <div class="col-md-12 text-right">
-                  <span><strong>ساعت: </strong></span>
-                  <!--<span>{{toPersianNumber(this.start.add(this.$parent.fieldData.duration, 'minutes').format('HH:mm'))}}</span>-->
-                </div>
-                <div class="col-md-12 text-right">
-                  <span><strong>قابل پرداخت: </strong></span><span>{{toPersianNumber(this.price)}}</span><span> تومان</span>
-                </div>
-              </div>
-              <div class="row">
-
-                <div v-if="$store.state.user.credit > this.price" class="alert alert-success">مبلغ از اعتبار شما کم می
-                  شود.
-                </div>
-                <div v-else class="alert alert-danger">اعتبار شما برای رزرو این سالن کافی نیست
-                  <a class="btn btn-info" :href="`https://api.asansport.com/profile/credit/add/`">افزایش اعتبار</a>
+                  <span><strong>زمان: </strong></span>
+                  {{selectedBooking.start}}
                 </div>
 
-                <div class="col-md-10 col-md-offset-1">
-                  <button class="btn btn-block btn-success margin-top-20" @click="book">ثبت سفارش</button>
-                </div>
               </div>
+                <div class="col-md-10">
+                  <button class="btn btn-block btn-success margin-top-30" @click="viewBooking">ثبت تغییرات</button>
+                </div>
             </div>
             <div v-else>
 
@@ -186,15 +157,16 @@
           bookable: false
         },
 
+        loaded:false,
         config: {
           eventClick: (event) => {
             this.selected = event;
-            alert(event.event_type)
               if(event.event_type === 'busyTime') {
                 this.$refs.removeBusyTimeModal.open();
               }
               if(event.event_type === 'booking') {
                 // Handle booking event click
+                this.viewBooking(event.id);
               }
           },
           dayClick: (event) => {
@@ -202,8 +174,8 @@
             this.start = (event.utc().format('D-M-Y H:mm'));
           },
           select: (start, end) => {
-              this.selection.start = start
-              this.selection.end = end
+              this.selection.start = start;
+              this.selection.end = end;
               this.$refs.createBooking.disabled = moment.duration(end.diff(start)).asMinutes() !== 60
               this.$refs.calendarModal.open();
           },
@@ -245,7 +217,7 @@
             // maxTime: '23:59'
 
         },
-
+        selectedBooking:'',
         selected: {},
       };
     },
@@ -267,41 +239,31 @@
       eventCreated(...test) {
         console.log(test);
       },
-      book() {
-
-        console.log(this.repeats);
-        console.log(this.notes);
-        console.log(this.discount_code);
-        console.log(this.start);
-
-        let dat = {
-          start: this.start,
-          repeats: this.repeats,
-          notes: (this.notes == null) ? this.notes : '',
-          discount_code: (this.discount_code == null) ? this.discount_code : ''
-        };
-        let config = {
+      viewBooking(bookID){
+        const config = {
           headers: {
             Authorization: 'Bearer ' + this.$store.state.token,
             'Content-Type': 'application/json',
             'Accept': 'application/json'
           }
         };
-        axios.post('https://api.asansport.com/v1/fields/' + this.$route.params.id + '/book', dat, config)
-          .then(response => {
-            if (response.status < 300) {
-              this.notif('توجه', 'رزرو سالن شما با موفقیت ثبت شد', 'success')
-            } else {
-              this.notif('خطا', 'خطای داخلی، لطفا بعدا تلاش کنید', 'error');
-            }
-          })
-          .catch(e => {
-            console.log(e);
-            this.notif('خطا', 'خطا در برقراری ارتباط', 'error');
-          });
-        this.repeats = 1;
-        this.notes = null;
-        this.discount_code = null;
+        axios.get('https://api.asansport.com/v1/bookings/'+bookID, config).then(resp => {
+          console.log(resp.data);
+          if (resp.status < 300) {
+            this.selectedBooking = resp.data.data;
+            console.log(resp.data);
+            this.loaded=true;
+            this.$refs.book.open();
+
+          }
+          else {
+            console.log(resp);
+            console.log("BEGAII");
+
+          }
+        }).catch(e => {
+          console.log(e + "===============");
+        });
       },
 
       createBusyTime() {
@@ -316,7 +278,7 @@
               start: this.selection.start.locale('en').format('Y-M-D H:mm'),
               end: this.selection.end.locale('en').format('Y-M-D H:mm'),
               repeats: this.repeats,
-          }
+          };
           axios.post('https://api.asansport.com/v1/fields/' + this.$store.state.current_field + '/admin/schedule', data,config)
               .then(response => {
                   if (response.status === 201) {
