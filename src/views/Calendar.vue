@@ -189,7 +189,6 @@
         config: {
           eventClick: (event) => {
             this.selected = event;
-            alert(event.event_type)
               if(event.event_type === 'busyTime') {
                 this.$refs.removeBusyTimeModal.open();
               }
