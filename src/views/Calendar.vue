@@ -14,7 +14,7 @@
                          @event-created="eventCreated" :config="config"></full-calendar>
           <sweet-modal ref="book">
             <h3>رزرو سالن</h3>
-            <div v-if="slotAvailable()">
+            <div v-if="true">
               <div class="row">
                 <div class="col-md-6 col-sm-6">
                   <div class="row">
@@ -47,7 +47,6 @@
                         <input v-model="discount_code" type="text" id="discount_code" name="discount_code"
                                class="form-control required" placeholder="کد تخفیف">
                         <span class="input-group-btn">
-                    <button class="btn btn-info" type="submit" @click="discount">بررسی</button>
                 </span>
                       </div>
                     </div>
@@ -177,7 +176,7 @@
           select: (start, end) => {
               this.selection.start = start
               this.selection.end = end
-              this.$refs.createBooking.disabled = moment.duration(end.diff(start)).asMinutes() !== 60
+              // this.$refs.createBooking.disabled = moment.duration(end.diff(start)).asMinutes() !== 60
               this.$refs.calendarModal.open();
           },
           // windowResize: function(view) {
