@@ -1,8 +1,25 @@
 <template>
   <div>
     <sweet-modal ref="calendarModal">
-      <sweet-modal-tab ref="createBusyTime" title="رزرو وقت" id="tab1">Contents of Tab 1</sweet-modal-tab>
-      <sweet-modal-tab ref="createBooking" title="ایجاد ساعت پر" id="tab2">Contents of Tab 2</sweet-modal-tab>
+      <sweet-modal-tab ref="createBusyTime" title="ایجاد ساعت عدم فعالیت" id="tab1">
+        <form @submit.prevent="createBusyTime()">
+          <b-row>
+          <b-col md="4">
+            <label for="repeats"> تعداد تکرار </label></b-col>
+          <b-col md="8">
+            <b-input id="repeats" type="number" v-model="repeats"></b-input>
+          </b-col>
+          </b-row>
+          <div style="height: 10px;"></div>
+          <b-row>
+            <b-col md="4"></b-col>
+            <b-col md="4"><b-button variant="primary" class="px-4 btn-block pull-left" @click="createBusyTime()">ذخیره</b-button></b-col>
+          </b-row>
+        </form>
+      </sweet-modal-tab>
+      <sweet-modal-tab ref="createBooking" title="رزرو وقت" id="tab2">
+
+      </sweet-modal-tab>
     </sweet-modal>
 
 
@@ -63,11 +80,9 @@
               <div class="divider"></div>
               <div class="row">
                 <div class="col-md-12 text-right">
-                  <span><strong>تاریخ: </strong></span><span>{{`${toPersianNumber(this.start.jYear())}/${toPersianNumber(this.start.jMonth()+1)}/${toPersianNumber(this.start.jDate())}`}}</span>
                 </div>
                 <div class="col-md-12 text-right">
                   <span><strong>ساعت: </strong></span>
-                  <span>{{toPersianNumber(this.start.format('HH:mm'))}}</span> الی
                   <!--<span>{{toPersianNumber(this.start.add(this.$parent.fieldData.duration, 'minutes').format('HH:mm'))}}</span>-->
                 </div>
                 <div class="col-md-12 text-right">
@@ -149,6 +164,7 @@
   import {SweetModal, SweetModalTab} from 'sweet-modal-vue'
   import axios from 'axios'
   import jMoment from 'moment-jalaali'
+  import Button from "sweet-modal-vue/docs/components/Button";
 
   export default {
     name: 'FieldCalendar',
@@ -176,7 +192,7 @@
           select: (start, end) => {
               this.selection.start = start
               this.selection.end = end
-              // this.$refs.createBooking.disabled = moment.duration(end.diff(start)).asMinutes() !== 60
+              this.$refs.createBooking.disabled = moment.duration(end.diff(start)).asMinutes() !== 60
               this.$refs.calendarModal.open();
           },
           // windowResize: function(view) {
@@ -279,17 +295,17 @@
       createBusyTime() {
           let config = {
               headers: {
-                  Authorization: 'Bearer ' + self.$store.state.token,
+                  Authorization: 'Bearer ' + this.$store.state.token,
                   'Content-Type': 'application/json',
                   'Accept': 'application/json'
               }
           };
           let data = {
-              start: this.selection.start,
-              end: this.selection.end,
+              start: this.selection.start.locale('en').format('Y-M-D H:mm'),
+              end: this.selection.end.locale('en').format('Y-M-D H:mm'),
               repeats: this.repeats,
           }
-          axios.post('https://api.asansport.com/v1/fields/' + self.$store.state.current_field + '/admin/schedule', data,config)
+          axios.post('https://api.asansport.com/v1/fields/' + this.$store.state.current_field + '/admin/schedule', data,config)
               .then(response => {
                   if (response.status === 201) {
                       this.refreshEvents()
@@ -364,7 +380,8 @@
       },
     },
     components: {
-      SweetModal,
+        Button,
+        SweetModal,
       SweetModalTab
     }
   };
