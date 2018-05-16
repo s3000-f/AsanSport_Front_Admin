@@ -22,6 +22,12 @@
       </sweet-modal-tab>
     </sweet-modal>
 
+    <sweet-modal ref="removeBusyTimeModal" icon="error">
+        <div>از حذف این مورد اطمینان دارید؟</div>
+      <b-button>حذف این مورد</b-button>
+      <b-button variant="danger">حذف این مورد و تمام تکرار ها</b-button>
+    </sweet-modal>
+
 
     <div class="animated fadeIn">
     <b-row>
@@ -183,7 +189,13 @@
         config: {
           eventClick: (event) => {
             this.selected = event;
-            alert(event.id)
+            alert(event.event_type)
+              if(event.event_type === 'busyTime') {
+                this.$refs.removeBusyTimeModal.open();
+              }
+              if(event.event_type === 'booking') {
+                // Handle booking event click
+              }
           },
           dayClick: (event) => {
             console.log(event.utc().format('D-M-Y H:mm'));
@@ -308,7 +320,9 @@
           axios.post('https://api.asansport.com/v1/fields/' + this.$store.state.current_field + '/admin/schedule', data,config)
               .then(response => {
                   if (response.status === 201) {
-                      this.refreshEvents()
+                      this.refreshEvents();
+                      this.$refs.calendarModal.close();
+                      this.repeats = 1;
                   } else {
                       this.notif('خطا', 'خطای داخلی، لطفا بعدا تلاش کنید', 'error');
                   }
@@ -338,6 +352,7 @@
                 .then(response => {
                   if (response.status < 300) {
                     console.log(response.data)
+                    response.data.data.forEach(function(obj) { obj.event_type = 'booking'; });
                     callback(response.data.data)
                   } else {
                     this.notif('خطا', 'خطای داخلی، لطفا بعدا تلاش کنید', 'error');
@@ -347,7 +362,7 @@
                   console.log(e);
                   this.notif('خطا', 'خطا در برقراری ارتباط', 'error');
                 });
-            }
+            },
           },
           {
             events(start, end, timezone, callback) {
@@ -363,6 +378,7 @@
                 .then(response => {
                   if (response.status < 300) {
                     console.log(response.data)
+                    response.data.forEach(function(obj) { obj.event_type = 'busyTime'; });
                     callback(response.data)
                   } else {
                     this.notif('خطا', 'خطای داخلی، لطفا بعدا تلاش کنید', 'error');
@@ -374,7 +390,7 @@
                 });
             },
               color: 'red',
-              overlap: false
+              overlap: false,
           },
         ];
       },
