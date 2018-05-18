@@ -179,6 +179,13 @@
               this.$refs.createBooking.disabled = moment.duration(end.diff(start)).asMinutes() !== 60
               this.$refs.calendarModal.open();
           },
+          eventRender: (event, element, view) => {
+              if(view.type == 'month' && event.event_type == 'busyTime') {
+                  $(element).hide();
+              } else {
+                  $(element).show();
+              }
+          },
           // windowResize: function(view) {
           //     if (window.width < 514) {
           //         this.$refs.calendar.fireMethod('changeView', 'basicDay')
@@ -198,23 +205,30 @@
             prevYear: 'left-double-arrow',
             nextYear: 'right-double-arrow'
           },
+          buttonText: {
+              today: 'امروز',
+              month: 'ماه',
+              week: 'هفته',
+              day: 'روز'
+          },
           locale: 'fa',
           isJalaali: true,
           isRTL: true,
           lang: 'fa',
           eventLimit: false, // allow "more" link when too many events
-          defaultView: 'agendaWeek',
+          defaultView: ((typeof window.orientation !== "undefined") || (navigator.userAgent.indexOf('IEMobile') !== -1))
+              ? 'agendaDay' : 'agendaWeek',
           height: 'auto',
           allDaySlot: false,
           eventDurationEditable: false,
           eventOverlap: false,
-          slotDuration: '01:00:00',
+          slotDuration: '01:30:00',
           slotLabelFormat: 'HH:mm',
           editable: false,
           overlap: false,
-          minTime: '06:00',
+          minTime: '8:00',
+          maxTime: '24:30',
           displayEventTime: false
-            // maxTime: '23:59'
 
         },
         selectedBooking:'',
@@ -336,7 +350,7 @@
                     }
                 };
               axios.get('https://api.asansport.com/v1/fields/' + self.$store.state.current_field + '/admin/schedule'
-                  + `?start=${start}&end=${end}`, config)
+                  + `?start=${start}&end=${end}&withoutBookings=true`, config)
                 .then(response => {
                   if (response.status < 300) {
                     console.log(response.data)
@@ -351,7 +365,7 @@
                   this.notif('خطا', 'خطا در برقراری ارتباط', 'error');
                 });
             },
-              color: 'red',
+              color: '#F01515',
               overlap: false,
           },
         ];
