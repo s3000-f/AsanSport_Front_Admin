@@ -20,7 +20,7 @@ export default {
     };
     let fields = [];
     axios.get('https://api.asansport.com/v1/profile/fields', config).then(resp => {
-      if (resp.status < 300) {
+      if ( resp.status < 300 ) {
         fields = resp.data['data'];
       }
       else {

@@ -76,8 +76,8 @@
     </b-row>
     <b-row>
       <b-col md="12">
-        <b-card header="رزروهای شما" class="text-right font-lg">
-          <b-table class="mb-0 table-outline" responsive="sm" hover :items="tableItems" :per-page="5"
+        <b-card header="رزروهای امروز" class="text-right font-lg">
+          <b-table class="mb-0 table-outline" responsive="sm" hover :items="tableItems" :per-page="50"
                    :current-page="currentPage" :fields="tableFields"
                    head-variant="light" @row-clicked="reserveView">
             <div slot="user" slot-scope="item">
@@ -87,31 +87,14 @@
               {{item.value.time}}
             </i>
             <i class="flag-icon flag-icon-pw h1" title="pw" id="pw"></i>
+            <div slot="price" slot-scope="item">
+              <strong>{{item.price}}</strong>
+            </div>
             <div slot="result" slot-scope="item">
               <strong>{{item.value}}</strong>
             </div>
           </b-table>
-          <b-pagination size="md" :total-rows="tableItems.length" v-model="currentPage" :per-page="5"></b-pagination>
-        </b-card>
-      </b-col>
-    </b-row>
-    <b-row>
-      <b-col md="12">
-        <b-card header="تراکنش های شما" class="text-right font-lg">
-          <b-table class="mb-0 table-outline" responsive="sm" hover :items="table2Items" :fields="table2Fields"
-                   head-variant="light" @row-clicked="transactionView" :per-page="5" :current-page="currentPage2">
-            <i slot="date" class="h6 mb-0" slot-scope="item">
-              {{item.value}}
-            </i>
-            <i slot="amount" class="h5 mb-0" slot-scope="item">
-              {{item.value}}
-            </i>
-            <i class="flag-icon flag-icon-pw h1" title="pw"></i>
-            <div slot="reservation" slot-scope="item">
-              <span><strong>{{item.value}}</strong></span>
-            </div>
-          </b-table>
-          <b-pagination size="md" :total-rows="table2Items.length" v-model="currentPage2" :per-page="5"></b-pagination>
+          <!--<b-pagination size="md" :total-rows="tableItems.length" v-model="currentPage" :per-page="5"></b-pagination>-->
         </b-card>
       </b-col>
     </b-row>
@@ -175,6 +158,9 @@ salam
           start: {
             label: 'شروع'
           },
+          price: {
+            label: 'مبلغ'
+          },
           result: {
             label: 'وضعیت'
           }
@@ -205,12 +191,14 @@ salam
             'Accept': 'application/json'
           }
         };
-        axios.get('https://api.asansport.com/v1/fields/' + this.$store.state.current_field + '/admin/bookings', config).then(resp => {
+        axios.get('https://api.asansport.com/v1/fields/' + this.$store.state.current_field + '/admin/dashboard', config).then(resp => {
           if (resp.status < 300) {
-            resp.data.data.forEach(dat => {
+            console.log(resp.data);
+            resp.data.bookings.forEach(dat => {
               let d = {
                 user: {name: dat.booker_name},
                 start: {time: this.toPersianNumber(dat.start)},
+                price: {price: this.toPersianNumber(dat.amount)},
                 result: dat.status === 0 ? 'در حال بررسی' : dat.status === 1 ? 'ثبت شده' : 'لغو شده',
                 id: dat.id
               };

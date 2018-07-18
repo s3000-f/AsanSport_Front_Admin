@@ -17,7 +17,66 @@
           </b-row>
         </form>
       </sweet-modal-tab>
+
       <sweet-modal-tab ref="createBooking" title="رزرو وقت" id="tab2">
+        <div v-if="true">
+          <div class="row">
+            <div class="col-md-6 col-sm-6">
+              <div class="row">
+                <div class="col-md-12">
+                  <div class="fancy-form fancy-form-select">
+                    <span>تعداد جلسات: </span>
+                    <select v-model="repeats" class="form-control">
+                      <option value="1">1 جلسه</option>
+                      <option value="4">4 جلسه</option>
+                      <option value="8">8 جلسه</option>
+                      <option value="12">12 جلسه</option>
+                      <option value="16">16 جلسه</option>
+                      <option value="20">20 جلسه</option>
+                      <option value="24">24 جلسه</option>
+                      <option value="28">28 جلسه</option>
+                      <option value="32">32 جلسه</option>
+                      <option value="36">36 جلسه</option>
+                      <option value="40">40 جلسه</option>
+                      <option value="44">44 جلسه</option>
+                      <option value="48">48 جلسه</option>
+                      <option value="52">52 جلسه</option>
+                    </select>
+                    <i class="fancy-arrow"></i>
+                  </div>
+                </div>
+              </div>
+              <br>
+            </div>
+            <div class="col-md-6 col-sm-6">
+              <div class="fancy-form">
+
+              </div>
+            </div>
+          </div>
+          <div class="divider"></div>
+          <div class="row">
+            <div class="col-md-12 text-right">
+              <span><strong>تاریخ: </strong></span><span>{{`${toPersianNumber(this.start.jYear())}/${toPersianNumber(this.start.jMonth()+1)}/${toPersianNumber(this.start.jDate())}`}}</span>
+            </div>
+            <div class="col-md-12 text-right">
+              <span><strong>ساعت: </strong></span>
+              <span>{{toPersianNumber(this.start.format('HH:mm'))}}</span> الی
+              <span>{{toPersianNumber(this.start.add(90, 'minutes').format('HH:mm'))}}</span>
+            </div>
+          </div>
+          <div class="row">
+
+
+            <div class="col-md-10 col-md-offset-1">
+              <button class="btn btn-block btn-success margin-top-20"  @click="book" >ثبت وقت</button>
+            </div>
+          </div>
+        </div>
+        <div v-else>
+
+        </div>
+
 
       </sweet-modal-tab>
     </sweet-modal>
@@ -35,8 +94,8 @@
         <b-card header="تقویم من" class="text-right font-lg">
           <full-calendar ref="calendar" :event-sources="eventSources" @event-selected="eventSelected"
                          @event-created="eventCreated" :config="config"></full-calendar>
-          <sweet-modal v-if="loaded" ref="book">
-            <h3>رزرو سالن</h3>
+          <sweet-modal v-if="loaded" ref="view">
+            <h3>مشاهده رزرو</h3>
             <div v-if="true">
               <div class="row">
                 <div class="col-md-6 col-sm-6">
@@ -176,7 +235,7 @@
           select: (start, end) => {
               this.selection.start = start;
               this.selection.end = end;
-              this.$refs.createBooking.disabled = moment.duration(end.diff(start)).asMinutes() !== 60
+              // this.$refs.createBooking.disabled = moment.duration(end.diff(start)).asMinutes() !== 60;
               this.$refs.calendarModal.open();
           },
           eventRender: (event, element, view) => {
@@ -235,7 +294,6 @@
         selected: {},
       };
     },
-
     methods: {
       refreshEvents() {
         this.$refs.calendar.$emit('refetch-events');
@@ -267,7 +325,7 @@
             this.selectedBooking = resp.data.data;
             console.log(resp.data);
             this.loaded=true;
-            this.$refs.book.open();
+            this.$refs.view.open();
 
           }
           else {
@@ -280,7 +338,43 @@
         });
       },
 
-      createBusyTime() {
+      book(){
+        let config = {
+          headers: {
+            Authorization: 'Bearer ' + this.$store.state.token,
+            'Content-Type': 'application/json',
+            'Accept': 'application/json'
+          }
+        };
+        let data = {
+          start: this.selection.start.locale('en').format('Y-M-D H:mm'),
+          notes:"reserved by admin",
+          repeats: this.repeats,
+          discount_code: '',
+          booker_given_name: "amir",
+          booker_last_name: "sh",
+          booker_mobile:"09213017164"
+        };
+
+        axios.post('https://api.asansport.com/v1/fields/' + this.$store.state.current_field + '/admin/bookings', data,config)
+          .then(response => {
+            if (response.status === 201) {
+              this.refreshEvents();
+              this.$refs.calendarModal.close();
+              this.repeats = 1;
+            } else {
+              this.notif('خطا', 'خطای داخلی، لطفا بعدا تلاش کنید', 'error');
+            }
+          })
+          .catch(e => {
+            console.log(e);
+            this.notif('خطا', 'خطا در برقراری ارتباط', 'error');
+          });
+
+      },
+
+      createBusyTime()
+      {
           let config = {
               headers: {
                   Authorization: 'Bearer ' + this.$store.state.token,
@@ -353,7 +447,7 @@
                   + `?start=${start}&end=${end}&withoutBookings=true`, config)
                 .then(response => {
                   if (response.status < 300) {
-                    console.log(response.data)
+                    console.log(response.data);
                     response.data.forEach(function(obj) { obj.event_type = 'busyTime'; });
                     callback(response.data)
                   } else {
