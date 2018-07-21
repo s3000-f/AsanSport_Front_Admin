@@ -63,7 +63,7 @@ export default {
   verifyUser: context => {
     context.commit('verifyUser');
   },
-  setCurrentField: (context, id) => {
+  setCurrentField: (context, id , duration) => {
     context.commit('setCurrentField', id);
   }
 }

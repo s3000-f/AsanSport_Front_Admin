@@ -48,7 +48,7 @@ export default{
   verifyUser: state => {
   state.user.verified = true;
 },
-  setCurrentField: (state, id) => {
+  setCurrentField: (state, id , duration) => {
     state.current_field = id;
   }
 }
