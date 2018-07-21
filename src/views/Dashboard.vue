@@ -13,7 +13,7 @@
               <!--<b-dropdown-item>Something else here...</b-dropdown-item>-->
               <!--<b-dropdown-item disabled>Disabled action</b-dropdown-item>-->
             <!--</b-dropdown>-->
-            <h4 class="mb-0" v-model="last_month_bookings_count">{{last_month_bookings_count}}</h4>
+            <h4 class="mb-0">{{last_month_bookings_count}}</h4>
             <p>تعداد رزرو های ماه گذشته</p>
           </b-card-body>
           <card-line1-chart-example class="chart-wrapper px-3" style="height:70px;" height="70"/>
@@ -31,8 +31,8 @@
               <b-dropdown-item>Something else here...</b-dropdown-item>
               <b-dropdown-item disabled>Disabled action</b-dropdown-item>
             </b-dropdown>
-            <h4 class="mb-0">9.823</h4>
-            <p>Members online</p>
+            <h4 class="mb-0">{{last_month_bookings_income}}</h4>
+            <p>درامد رزرو های ماه گذشته</p>
           </b-card-body>
           <card-line2-chart-example class="chart-wrapper px-3" style="height:70px;" height="70"/>
         </b-card>
@@ -49,8 +49,8 @@
               <b-dropdown-item>Something else here...</b-dropdown-item>
               <b-dropdown-item disabled>Disabled action</b-dropdown-item>
             </b-dropdown>
-            <h4 class="mb-0">9.823</h4>
-            <p>Members online</p>
+            <h4 class="mb-0">{{current_week_bookings_count}}</h4>
+            <p>رزرو های هفته جاری</p>
           </b-card-body>
           <card-line3-chart-example class="chart-wrapper" style="height:70px;" height="70"/>
         </b-card>
@@ -68,7 +68,7 @@
               <b-dropdown-item disabled>Disabled action</b-dropdown-item>
             </b-dropdown>
             <h4 class="mb-0">9.823</h4>
-            <p>Members online</p>
+            <p>درامد ماهیانه</p>
           </b-card-body>
           <card-bar-chart-example class="chart-wrapper px-3" style="height:70px;" height="70"/>
         </b-card>
