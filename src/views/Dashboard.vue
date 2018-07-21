@@ -199,7 +199,7 @@ salam
                 user: {name: dat.booker_name},
                 start: {time: this.toPersianNumber(dat.start)},
                 price: {price: this.toPersianNumber(dat.amount)},
-                result: dat.status === 0 ? 'در حال بررسی' : dat.status === 1 ? 'ثبت شده' : 'لغو شده',
+                result: dat.status === 0 ? 'دستی' : dat.status === 1 ? 'خودکار' : 'لغو شده',
                 id: dat.id
               };
               this.tableItems.push(d);
