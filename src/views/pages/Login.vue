@@ -18,7 +18,7 @@
                   <b-input-group-prepend>
                     <b-input-group-text><i class="icon-lock"></i></b-input-group-text>
                   </b-input-group-prepend>
-                  <input type="password" class="form-control" placeholder="رمزعبور" v-model="password">
+                  <input type="password" class="form-control" placeholder="رمزعبور" v-model="password" @keyup.enter="login">
                 </b-input-group>
                 <b-row>
                   <b-col cols="6">

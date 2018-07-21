@@ -4,15 +4,6 @@
       <b-col sm="6" lg="3">
         <b-card no-body class="bg-primary">
           <b-card-body class="pb-0">
-            <b-dropdown class="float-right" variant="transparent p-0" right>
-              <template slot="button-content">
-                <i class="icon-settings"></i>
-              </template>
-              <b-dropdown-item>Action</b-dropdown-item>
-              <b-dropdown-item>Another action</b-dropdown-item>
-              <b-dropdown-item>Something else here...</b-dropdown-item>
-              <b-dropdown-item disabled>Disabled action</b-dropdown-item>
-            </b-dropdown>
             <h4 class="mb-0">{{toPersianNumber(last_month_bookings_count)}}</h4>
             <p>تعداد رزرو های ماه گذشته</p>
           </b-card-body>
@@ -22,15 +13,6 @@
       <b-col sm="6" lg="3">
         <b-card no-body class="bg-info">
           <b-card-body class="pb-0">
-            <b-dropdown class="float-right" variant="transparent p-0" right no-caret>
-              <template slot="button-content">
-                <i class="icon-location-pin"></i>
-              </template>
-              <b-dropdown-item>Action</b-dropdown-item>
-              <b-dropdown-item>Another action</b-dropdown-item>
-              <b-dropdown-item>Something else here...</b-dropdown-item>
-              <b-dropdown-item disabled>Disabled action</b-dropdown-item>
-            </b-dropdown>
             <h4 class="mb-0">{{toPersianNumber(last_month_bookings_income)}}</h4>
             <p>درامد رزرو های ماه گذشته</p>
           </b-card-body>
@@ -40,15 +22,6 @@
       <b-col sm="6" lg="3">
         <b-card no-body class="bg-warning">
           <b-card-body class="pb-0">
-            <b-dropdown class="float-right" variant="transparent p-0" right>
-              <template slot="button-content">
-                <i class="icon-settings"></i>
-              </template>
-              <b-dropdown-item>Action</b-dropdown-item>
-              <b-dropdown-item>Another action</b-dropdown-item>
-              <b-dropdown-item>Something else here...</b-dropdown-item>
-              <b-dropdown-item disabled>Disabled action</b-dropdown-item>
-            </b-dropdown>
             <h4 class="mb-0">{{toPersianNumber(current_week_bookings_count)}}</h4>
             <p>رزرو های هفته جاری</p>
           </b-card-body>
@@ -58,15 +31,6 @@
       <b-col sm="6" lg="3">
         <b-card no-body class="bg-danger">
           <b-card-body class="pb-0">
-            <b-dropdown class="float-right" variant="transparent p-0" right>
-              <template slot="button-content">
-                <i class="icon-settings"></i>
-              </template>
-              <b-dropdown-item>Action</b-dropdown-item>
-              <b-dropdown-item>Another action</b-dropdown-item>
-              <b-dropdown-item>Something else here...</b-dropdown-item>
-              <b-dropdown-item disabled>Disabled action</b-dropdown-item>
-            </b-dropdown>
             <h4 class="mb-0">9.823</h4>
             <p>درامد ماهیانه</p>
           </b-card-body>
@@ -165,18 +129,6 @@ salam
             label: 'وضعیت'
           }
         },
-        table2Fields: {
-          date: {
-            label: 'تاریخ'
-          },
-          amount: {
-            label: 'مبلغ'
-          },
-          reservation: {
-            label: 'شرح'
-          }
-        },
-        table2Items: [],
         selectedBooking:'',
         notes:'',
         current_week_bookings_count:'',
@@ -199,11 +151,12 @@ salam
         axios.get('https://api.asansport.com/v1/fields/' + this.$store.state.current_field + '/admin/dashboard', config).then(resp => {
           if (resp.status < 300) {
             console.log(resp.data);
+            console.log(resp.data.bookings[0].amount);
             resp.data.bookings.forEach(dat => {
               let d = {
                 user: {name: dat.booker_name},
                 start: {time: this.toPersianNumber(dat.start)},
-                price: {price: this.toPersianNumber(dat.amount)},
+                price: {amount: this.toPersianNumber(dat.amount)},
                 result: dat.status === 1 ? 'دستی' : dat.status === 0 ? 'خودکار' : 'لغو شده',
                 id: dat.id
               };
@@ -213,35 +166,6 @@ salam
             this.last_month_bookings_count = resp.data.status.last_month_bookings_count;
             this.last_month_bookings_income = resp.data.status.last_month_bookings_income;
             this.monthly_income = resp.data.status.monthly_income;
-          }
-          else {
-            console.log(resp);
-          }
-        }).catch(e => {
-          console.log(e);
-        });
-      },
-      getTransactions() {
-        const config = {
-          headers: {
-            Authorization: 'Bearer ' + this.$store.state.token,
-            'Content-Type': 'application/json',
-            'Accept': 'application/json'
-          }
-        };
-        axios.get('https://api.asansport.com/v1/fields/' + this.$store.state.current_field + '/admin/transactions', config).then(resp => {
-          if (resp.status < 300) {
-            resp.data.data.forEach(dat => {
-
-              let d = {
-                date: this.toPersianNumber(dat.created_at),
-                amount: this.toPersianNumber(dat.amount),
-                reservation: dat.description,
-                id: dat.id
-              };
-              this.table2Items.push(d);
-            })
-
           }
           else {
             console.log(resp);
@@ -319,7 +243,6 @@ salam
     },
     created() {
       this.getBookings();
-      this.getTransactions();
     }
   }
 </script>

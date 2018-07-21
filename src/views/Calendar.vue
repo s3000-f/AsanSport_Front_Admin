@@ -138,8 +138,8 @@
                   </div>
                   <div class="col-md-6 col-sm-6">
                     <div class="fancy-form">
-                    <textarea v-model="notes" rows="5" class="form-control"
-                              placeholder="یادداشت های خود را در اینجا بنویسید.">{{notes}}</textarea>
+                    <textarea v-model="selectedBooking.notes" rows="5" class="form-control"
+                              placeholder="یادداشت های خود را در اینجا بنویسید." v-text="selectedBooking.notes">{{selectedBooking.notes}}</textarea>
                     </div>
                   </div>
                 </div>
