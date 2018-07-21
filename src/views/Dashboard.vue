@@ -13,7 +13,7 @@
               <b-dropdown-item>Something else here...</b-dropdown-item>
               <b-dropdown-item disabled>Disabled action</b-dropdown-item>
             </b-dropdown>
-            <h4 class="mb-0">{{last_month_bookings_count}}</h4>
+            <h4 class="mb-0">{{toPersianNumber(last_month_bookings_count)}}</h4>
             <p>تعداد رزرو های ماه گذشته</p>
           </b-card-body>
           <card-line1-chart-example class="chart-wrapper px-3" style="height:70px;" height="70"/>
@@ -31,7 +31,7 @@
               <b-dropdown-item>Something else here...</b-dropdown-item>
               <b-dropdown-item disabled>Disabled action</b-dropdown-item>
             </b-dropdown>
-            <h4 class="mb-0">{{last_month_bookings_income}}</h4>
+            <h4 class="mb-0">{{toPersianNumber(last_month_bookings_income)}}</h4>
             <p>درامد رزرو های ماه گذشته</p>
           </b-card-body>
           <card-line2-chart-example class="chart-wrapper px-3" style="height:70px;" height="70"/>
@@ -49,7 +49,7 @@
               <b-dropdown-item>Something else here...</b-dropdown-item>
               <b-dropdown-item disabled>Disabled action</b-dropdown-item>
             </b-dropdown>
-            <h4 class="mb-0">{{current_week_bookings_count}}</h4>
+            <h4 class="mb-0">{{toPersianNumber(current_week_bookings_count)}}</h4>
             <p>رزرو های هفته جاری</p>
           </b-card-body>
           <card-line3-chart-example class="chart-wrapper" style="height:70px;" height="70"/>
@@ -179,9 +179,9 @@ salam
         table2Items: [],
         selectedBooking:'',
         notes:'',
-        current_week_bookings_count:'2',
-        last_month_bookings_count:'7',
-        last_month_bookings_income:'199000',
+        current_week_bookings_count:'',
+        last_month_bookings_count:'',
+        last_month_bookings_income:'',
         monthly_income:[]
 
 
@@ -204,15 +204,15 @@ salam
                 user: {name: dat.booker_name},
                 start: {time: this.toPersianNumber(dat.start)},
                 price: {price: this.toPersianNumber(dat.amount)},
-                result: dat.status === 0 ? 'دستی' : dat.status === 1 ? 'خودکار' : 'لغو شده',
+                result: dat.status === 1 ? 'دستی' : dat.status === 0 ? 'خودکار' : 'لغو شده',
                 id: dat.id
               };
               this.tableItems.push(d);
             });
             this.current_week_bookings_count = resp.data.status.current_week_bookings_count;
-            this.last_month_bookings_count = resp.data.last_month_bookings_count;
-            this.last_month_bookings_income = resp.data.last_month_bookings_income;
-            this.monthly_income = resp.data.monthly_income;
+            this.last_month_bookings_count = resp.data.status.last_month_bookings_count;
+            this.last_month_bookings_income = resp.data.status.last_month_bookings_income;
+            this.monthly_income = resp.data.status.monthly_income;
           }
           else {
             console.log(resp);
