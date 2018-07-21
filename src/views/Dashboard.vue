@@ -232,6 +232,7 @@ salam
         axios.get('https://api.asansport.com/v1/fields/' + this.$store.state.current_field + '/admin/transactions', config).then(resp => {
           if (resp.status < 300) {
             resp.data.data.forEach(dat => {
+
               let d = {
                 date: this.toPersianNumber(dat.created_at),
                 amount: this.toPersianNumber(dat.amount),

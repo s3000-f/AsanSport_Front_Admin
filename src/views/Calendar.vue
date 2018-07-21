@@ -111,7 +111,7 @@
           <b-card header="تقویم من" class="text-right font-lg">
             <full-calendar ref="calendar" :event-sources="eventSources" @event-selected="eventSelected"
                            @event-created="eventCreated" :config="config"></full-calendar>
-            <sweet-modal ref="view" v-if="loaded">
+            <sweet-modal ref="view">
               <h3>مشاهده رزرو</h3>
               <div v-if="true">
                 <div class="row">
@@ -225,7 +225,7 @@
     data() {
       return {
         repeats: 1,
-        book_repeats:1,
+        book_repeats: 1,
         discount_code: null,
         notes: null,
         start: jMoment(),
@@ -311,7 +311,7 @@
           displayEventTime: false
 
         },
-        selectedBooking: '',
+        selectedBooking: {user:{name:""} , transaction:{amount:0 , status:1}},
         selected: {},
       };
     },
@@ -346,7 +346,7 @@
             this.selectedBooking = resp.data.data;
             console.log(resp.data);
             this.loaded = true;
-            this.$refs.view.open();
+              this.$refs.view.open();
 
           }
           else {
@@ -355,7 +355,7 @@
 
           }
         }).catch(e => {
-          console.log(e + "===============");
+          console.log(e + "   ===============");
         });
       },
 
