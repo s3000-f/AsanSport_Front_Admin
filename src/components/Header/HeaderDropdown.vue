@@ -10,6 +10,7 @@
   </b-nav-item-dropdown>
 </template>
 <script>
+  import axios from 'axios';
   export default {
     name: 'header-dropdown',
     data: () => {
@@ -18,6 +19,26 @@
     methods: {
       switchField(field) {
         this.$store.dispatch('setCurrentField', field.id);
+        let config = {
+          headers: {
+            Authorization: 'Bearer ' + this.$store.state.token,
+            'Content-Type': 'application/json',
+            'Accept': 'application/json'
+          }
+        };
+        axios.get('https://api.asansport.com/v1/fields/' + this.$store.state.current_field  , config).then(response => {
+          if (response.status === 201) {
+            let start = response.data.day_start;
+            let end = response.data.day_end;
+            let duration = response.data.duration;
+            this.$store.dispatch('setCurrentFieldDetails', start , end , duration);
+          } else {
+          }
+        })
+          .catch(e => {
+            console.log(e);
+            this.notif('خطا', 'خطا در برقراری ارتباط', 'error');
+          });
         this.$notify({
           text: field.name + ' انتخاب شد',
           type: 'success',

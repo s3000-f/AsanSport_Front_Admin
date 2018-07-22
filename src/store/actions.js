@@ -55,7 +55,7 @@ export default {
       console.log(response)
     }).catch(e => {
       console.log(e)
-    })
+    });
     commit('logout');
     commit('resetUser');
     commit('resetUser');
@@ -65,5 +65,10 @@ export default {
   },
   setCurrentField: (context, id) => {
     context.commit('setCurrentField', id);
+  },
+  setCurrentFieldDetails: (context, start , end , duration) => {
+    context.commit('setCurrentField', start);
+    context.commit('setCurrentField', end);
+    context.commit('setCurrentField', duration);
   }
 }

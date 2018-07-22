@@ -307,7 +307,7 @@
           slotLabelFormat: 'HH:mm',
           editable: false,
           overlap: false,
-          minTime: '8:00',  //============
+          minTime: this.$store.state.current_field_details.start,  //============
           maxTime: '24:30', // ===============
           displayEventTime: false
 
@@ -385,12 +385,12 @@
               this.$refs.calendarModal.close();
               this.repeats = 1;
             } else {
-              this.notif('خطا', 'خطای داخلی، لطفا بعدا تلاش کنید', 'error');
+              this.notify('خطا', 'خطای داخلی، لطفا بعدا تلاش کنید', 'error');
             }
           })
           .catch(e => {
             console.log(e);
-            this.notif('خطا', 'خطا در برقراری ارتباط', 'error');
+            this.notify('خطا', 'خطا در برقراری ارتباط', 'error');
           });
 
       },
@@ -405,36 +405,44 @@
         };
         if (mode === 1) {
 
-          axios.post('https://api.asansport.com/v1/fields/' + this.$store.state.current_field + '/busyTime/' + this.selected.id , '' ,config)
+          axios.delete('https://api.asansport.com/v1/fields/' + this.$store.state.current_field + '/busyTime/' + this.selected.id  ,config)
             .then(response => {
               if (response.status === 200) {
-                this.notif('موفقیت' , 'حذف این مورد با موفقیت انجام شد' , 'success')
+                this.notif('موفقیت' , 'حذف این مورد با موفقیت انجام شد' , 'success');
+                this.$refs.calendar.$emit('remove-event', this.selected);
+                this.selected = {};
               } else {
                 this.notif('خطا', 'خطای داخلی، لطفا بعدا تلاش کنید', 'error');
               }
+              console.log("==============");
+              this.$refs.removeBusyTimeModal.close();
             })
             .catch(e => {
               console.log(e);
-              this.notif('خطا', 'خطا در برقراری ارتباط', 'error');
+              this.notify('خطا', 'خطا در برقراری ارتباط', 'error');
             });
 
         }
         else if (mode === 2) {
 
-          axios.post('https://api.asansport.com/v1/fields/' + this.$store.state.current_field + '/busyTime/' + this.selected.id +'?withRepeats', '' ,config)
+          axios.delete('https://api.asansport.com/v1/fields/' + this.$store.state.current_field + '/busyTime/' + this.selected.id +'?withRepeats' ,config)
             .then(response => {
               if (response.status === 200) {
-                this.notif('موفقیت' , 'حذف این مورد با موفقیت انجام شد' , 'success')
+                this.notify('موفقیت' , 'حذف این مورد با موفقیت انجام شد' , 'success');
+                this.$refs.calendar.$emit('remove-event', this.selected);
+                this.selected = {};
               } else {
-                this.notif('خطا', 'خطای داخلی، لطفا بعدا تلاش کنید', 'error');
+                this.notify('خطا', 'خطای داخلی، لطفا بعدا تلاش کنید', 'error');
               }
+              this.$refs.removeBusyTimeModal.close();
             })
             .catch(e => {
               console.log(e);
-              this.notif('خطا', 'خطا در برقراری ارتباط', 'error');
+              this.notify('خطا', 'خطا در برقراری ارتباط', 'error');
             });
 
         }
+
       },
       createBusyTime() {
         let config = {
@@ -456,12 +464,12 @@
               this.$refs.calendarModal.close();
               this.repeats = 1;
             } else {
-              this.notif('خطا', 'خطای داخلی، لطفا بعدا تلاش کنید', 'error');
+              this.notify('خطا', 'خطای داخلی، لطفا بعدا تلاش کنید', 'error');
             }
           })
           .catch(e => {
             console.log(e);
-            this.notif('خطا', 'خطا در برقراری ارتباط', 'error');
+            this.notify('خطا', 'خطا در برقراری ارتباط', 'error');
           });
       }
     },
@@ -483,18 +491,18 @@
                 + `?start=${start}&end=${end}`, config)
                 .then(response => {
                   if (response.status < 300) {
-                    console.log(response.data)
+                    console.log(response.data);
                     response.data.data.forEach(function (obj) {
                       obj.event_type = 'booking';
                     });
                     callback(response.data.data)
                   } else {
-                    this.notif('خطا', 'خطای داخلی، لطفا بعدا تلاش کنید', 'error');
+                    this.notify('خطا', 'خطای داخلی، لطفا بعدا تلاش کنید', 'error');
                   }
                 })
                 .catch(e => {
                   console.log(e);
-                  this.notif('خطا', 'خطا در برقراری ارتباط', 'error');
+                  this.notify('خطا', 'خطا در برقراری ارتباط', 'error');
                 });
             },
           },
@@ -517,12 +525,12 @@
                     });
                     callback(response.data)
                   } else {
-                    this.notif('خطا', 'خطای داخلی، لطفا بعدا تلاش کنید', 'error');
+                    this.notify('خطا', 'خطای داخلی، لطفا بعدا تلاش کنید', 'error');
                   }
                 })
                 .catch(e => {
                   console.log(e);
-                  this.notif('خطا', 'خطا در برقراری ارتباط', 'error');
+                  this.notify('خطا', 'خطا در برقراری ارتباط', 'error');
                 });
             },
             color: '#F01515',
