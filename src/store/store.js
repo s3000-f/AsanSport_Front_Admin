@@ -26,7 +26,12 @@ export const store = new Vuex.Store({
       verified: false,
       fields: null
     },
-    current_field: ''
+    current_field: '',
+    current_field_details:{
+      duration:'',
+      start:'',
+      end:''
+    }
   },
   plugins: [createPersistedState({
     storage: {

@@ -58,12 +58,12 @@ export default {
     })
     commit('logout');
     commit('resetUser');
-    commit('resetGUser');
+    commit('resetUser');
   },
   verifyUser: context => {
     context.commit('verifyUser');
   },
-  setCurrentField: (context, id , duration) => {
+  setCurrentField: (context, id) => {
     context.commit('setCurrentField', id);
   }
 }

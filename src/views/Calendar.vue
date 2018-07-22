@@ -225,7 +225,7 @@
     data() {
       return {
         repeats: 1,
-        book_repeats: 1,
+        book_repeats: '',
         discount_code: null,
         notes: null,
         start: jMoment(),
@@ -242,6 +242,7 @@
           eventClick: (event) => {
             this.selected = event;
             if (event.event_type === 'busyTime') {
+              this.eventSelected(event);
               this.$refs.removeBusyTimeModal.open();
             }
             if (event.event_type === 'booking') {
@@ -256,7 +257,7 @@
           select: (start, end) => {
             this.selection.start = start;
             this.selection.end = end;
-            // this.$refs.createBooking.disabled = moment.duration(end.diff(start)).asMinutes() !== 60;
+            this.$refs.createBooking.disabled = moment.duration(end.diff(start)).asMinutes() > 90;  // ================
             this.$refs.calendarModal.open();
           },
           eventRender: (event, element, view) => {
@@ -306,8 +307,8 @@
           slotLabelFormat: 'HH:mm',
           editable: false,
           overlap: false,
-          minTime: '8:00',
-          maxTime: '24:30',
+          minTime: '8:00',  //============
+          maxTime: '24:30', // ===============
           displayEventTime: false
 
         },
@@ -404,8 +405,34 @@
         };
         if (mode === 1) {
 
+          axios.post('https://api.asansport.com/v1/fields/' + this.$store.state.current_field + '/busyTime/' + this.selected.id , '' ,config)
+            .then(response => {
+              if (response.status === 200) {
+                this.notif('موفقیت' , 'حذف این مورد با موفقیت انجام شد' , 'success')
+              } else {
+                this.notif('خطا', 'خطای داخلی، لطفا بعدا تلاش کنید', 'error');
+              }
+            })
+            .catch(e => {
+              console.log(e);
+              this.notif('خطا', 'خطا در برقراری ارتباط', 'error');
+            });
+
         }
         else if (mode === 2) {
+
+          axios.post('https://api.asansport.com/v1/fields/' + this.$store.state.current_field + '/busyTime/' + this.selected.id +'?withRepeats', '' ,config)
+            .then(response => {
+              if (response.status === 200) {
+                this.notif('موفقیت' , 'حذف این مورد با موفقیت انجام شد' , 'success')
+              } else {
+                this.notif('خطا', 'خطای داخلی، لطفا بعدا تلاش کنید', 'error');
+              }
+            })
+            .catch(e => {
+              console.log(e);
+              this.notif('خطا', 'خطا در برقراری ارتباط', 'error');
+            });
 
         }
       },

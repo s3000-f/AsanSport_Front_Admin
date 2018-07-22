@@ -5,7 +5,7 @@
       <b-badge variant="success" v-if="field.id === $store.state.current_field">فعال</b-badge>
     </b-dropdown-item>
     <b-dropdown-header tag="div" class="text-center"><strong>تنظیمات</strong></b-dropdown-header>
-    <b-dropdown-item><i class="fa fa-user"></i> پروفایل</b-dropdown-item>
+    <b-dropdown-item @click="$router.replace('/manager/base/cards' )"><i class="fa fa-user"></i> پروفایل</b-dropdown-item>
     <b-dropdown-item v-on:click="$store.dispatch('logout'); $router.replace('/');"><i class="fa fa-lock"></i> خروج</b-dropdown-item>
   </b-nav-item-dropdown>
 </template>
